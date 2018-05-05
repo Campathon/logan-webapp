@@ -9,7 +9,7 @@ export default {
         try {
             obj = JSON.parse(store.get(realKey));
         } catch (err) {
-            console.log('err', err);
+            // console.log('err', err);
         }
 
         return obj;

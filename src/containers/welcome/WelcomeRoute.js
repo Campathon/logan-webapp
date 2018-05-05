@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {Container, Col, Form, FormGroup, Input, Label, Button, Row} from "reactstrap";
 import AuthenService from "../../services/AuthenService";
+import * as roomApi from "../../api/room-api";
 
 class WelcomeRoute extends Component {
 
@@ -18,7 +19,7 @@ class WelcomeRoute extends Component {
         });
     }
 
-    _handleJoin() {
+    async _handleJoin() {
         const {room_id, name} = this.state;
 
         if (!room_id) {
@@ -35,17 +36,39 @@ class WelcomeRoute extends Component {
             return;
         }
 
-        AuthenService.set(this.state);
+        try {
+            const joinedRoom = await roomApi.joinRoom({name, room: room_id});
+            console.log('joinedRoom', joinedRoom);
 
-        this.props.history.replace(`/room/${room_id}`);
+            AuthenService.set({
+                ...joinedRoom,
+                name,
+                room_id,
+                is_leader: false
+            });
+
+            this.props.history.replace(`/room/${room_id}`);
+        } catch (err) {
+            alert(err.message);
+        }
     }
 
-    _handleCreateRoom() {
-        const {room_id, name} = this.state;
+    async _handleCreateRoom() {
+        try {
+            const newRoom = await roomApi.createRoom();
+            console.log('newroom', newRoom);
 
-        AuthenService.set(this.state);
+            AuthenService.set({
+                name: 'Quản trò',
+                room_info: newRoom,
+                room_id: newRoom.code,
+                is_leader: true
+            });
 
-        this.props.history.replace('/room/123')
+            this.props.history.replace(`/room/${newRoom.code}`);
+        } catch (err) {
+            alert(err.message);
+        }
     }
 
     render() {
@@ -66,7 +89,7 @@ class WelcomeRoute extends Component {
                             <FormGroup>
                                 <Label>Mã phòng</Label>
                                 <Input
-                                    type="text"
+                                    type="number"
                                     value={room_id}
                                     onChange={(event) => this._handleInputChange('room_id', event)}
                                 />

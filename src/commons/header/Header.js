@@ -11,6 +11,7 @@ import {
     UncontrolledDropdown
 } from "reactstrap";
 import AuthenService from "../../services/AuthenService";
+import * as SocketService from "../../services/SocketService";
 
 class Header extends Component {
 
@@ -30,6 +31,7 @@ class Header extends Component {
     }
 
     _handleLogout() {
+        SocketService.disconnect();
         AuthenService.set(null);
     }
 

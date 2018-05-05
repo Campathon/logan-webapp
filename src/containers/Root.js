@@ -42,7 +42,7 @@ const requireAuthen = (component) => (props) => {
 
 const requireUnAuthen = (component) => (props) => {
     const userInfo = AuthenService.get();
-    return !userInfo ? React.createElement(component, props) : <Redirect to='/room/123'/>
+    return !userInfo ? React.createElement(component, props) : <Redirect to={`/room/${userInfo.room_id}`}/>
 };
 
 export default Root;
