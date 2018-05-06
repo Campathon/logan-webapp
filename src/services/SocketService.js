@@ -23,6 +23,24 @@ export function removeListenNewUserJoin() {
 }
 
 
+// User change usersChanged
+export function listenUserChange({room_id, cb}) {
+    if (socket) {
+        console.log('listenUserChange', room_id);
+        socket.on('usersChanged', cb);
+    } else {
+        retry(listenNewUserJoin, {room_id, cb}, room_id);
+    }
+}
+
+export function removeListenUserChange() {
+    if (socket) {
+        console.log('removeListenUserChange');
+        socket.off('usersChanged');
+    }
+}
+
+
 // start game
 export function listenStartGame({room_id, cb}) {
     if (socket) {

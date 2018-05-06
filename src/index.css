@@ -15,3 +15,15 @@ body {
 .logan-card {
   margin-bottom: 20px;
 }
+
+.clickable {
+  cursor: pointer;
+}
+
+.img-question {
+  width: 15px;
+}
+
+.mgb {
+  margin-bottom: 40px;
+}

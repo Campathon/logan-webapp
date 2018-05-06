@@ -25,6 +25,7 @@ class Waiting extends Component {
         users: [],
         cards: [],
         selectedCards: [],
+        openPopoverId: null,
         canSelectCard: false
     };
 
@@ -40,12 +41,21 @@ class Waiting extends Component {
 
             this.setState({users, cards, selectedCards});
 
-            SocketService.listenNewUserJoin(
+            // SocketService.listenNewUserJoin(
+            //     {
+            //         room_id,
+            //         cb: (newUser) => {
+            //             console.log('newUser', newUser);
+            //             this._handleAddWatingUser(newUser);
+            //         }
+            //     }
+            // )
+            SocketService.listenUserChange(
                 {
                     room_id,
-                    cb: (newUser) => {
-                        console.log('newUser', newUser);
-                        this._handleAddWatingUser(newUser);
+                    cb: (users) => {
+                        console.log('users', users);
+                        this.setState({users});
                     }
                 }
             )
@@ -55,7 +65,8 @@ class Waiting extends Component {
     }
 
     componentWillUnmount() {
-        SocketService.removeListenNewUserJoin();
+        // SocketService.removeListenNewUserJoin();
+        SocketService.removeListenUserChange();
     }
 
     _handleAddWatingUser(newUser) {
@@ -94,16 +105,37 @@ class Waiting extends Component {
     _renderCards(cards) {
         return cards.map(
             (c, i) => (
-                <Col sm={6} key={c.name}>
+                <Col sm={6} xs={6} key={c.name}>
                     <Card className='logan-card'>
                         <CardImg top width="100%" src={c.image} alt="card"/>
                         <CardBody>
                             <CardTitle>
                                 {c.name}
-                                {/*<Popover placement="bottom" isOpen={this.state} target="Popover1" toggle={this.toggle}>*/}
-                                    {/*<PopoverHeader>Popover Title</PopoverHeader>*/}
-                                    {/*<PopoverBody>Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</PopoverBody>*/}
-                                {/*</Popover>*/}
+                                {' '}
+                                <img
+                                    className='clickable img-question'
+                                    src={'../image/ic_question.svg'}
+                                    id={`popover-${c._id}`}
+                                    onClick={
+                                        () => this.setState({openPopoverId: c._id})
+                                    }
+                                />
+                                <Popover placement="bottom"
+                                         target={`popover-${c._id}`}
+                                         isOpen={this.state.openPopoverId === c._id}
+                                         toggle={
+                                             () => {
+                                                 if (this.state.openPopoverId === c._id) {
+                                                     this.setState({openPopoverId: null});
+                                                 } else {
+                                                     this.setState({openPopoverId: c._id})
+                                                 }
+                                             }
+                                         }
+                                >
+                                    <PopoverHeader>{c.alias}</PopoverHeader>
+                                    <PopoverBody>{c.description}</PopoverBody>
+                                </Popover>
                             </CardTitle>
                             <Form inline>
                                 <FormGroup>
@@ -158,6 +190,7 @@ class Waiting extends Component {
                             >Chọn Thẻ</Button>
                         ) : null
                 }
+                <div className='mgb'/>
             </div>
         )
     }
