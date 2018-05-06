@@ -11,7 +11,7 @@ export function listenNewUserJoin({room_id, cb}) {
         console.log('listenNewUserJoin', room_id);
         socket.on('newUser', cb);
     } else {
-        retry(listenNewUserJoin, {room_id, cb}, room_id);
+        connect(room_id, listenNewUserJoin, {room_id, cb});
     }
 }
 
@@ -29,7 +29,7 @@ export function listenUserChange({room_id, cb}) {
         console.log('listenUserChange', room_id);
         socket.on('usersChanged', cb);
     } else {
-        retry(listenNewUserJoin, {room_id, cb}, room_id);
+        connect(room_id, listenUserChange, {room_id, cb});
     }
 }
 
@@ -46,7 +46,7 @@ export function listenRoomClose({room_id, cb}) {
         console.log('listenRoomClose', room_id);
         socket.on('roomClosed', cb);
     } else {
-        retry(listenRoomClose, {room_id, cb}, room_id);
+        connect(room_id, listenRoomClose, {room_id, cb});
     }
 }
 
@@ -64,7 +64,7 @@ export function listenStartGame({room_id, cb}) {
         console.log('listenStartGame', room_id);
         socket.on('startGame', cb);
     } else {
-        retry(listenStartGame, {room_id, cb}, room_id);
+        connect(room_id, listenStartGame, {room_id, cb});
     }
 }
 
@@ -75,49 +75,26 @@ export function removeListenStartGame() {
     }
 }
 
-let callbacks = [];
-let isLoading = false;
+export const connect = (room_id, cb, params) => {
+    socket = io.connect(BASE_URL, {query: {room: room_id}});
 
-export const connect = (room_id, cb) => {
-    callbacks.push(cb);
-    if (isLoading) {
-        return;
-    } else {
-        isLoading = true;
-    }
-
-    let _socket = io.connect(BASE_URL, {query: {room: room_id}});
-
-    _socket.on('connect', () => {
-        socket = _socket;
+    socket.on('connect', () => {
         console.log('Connect socket successfully!');
-
-        callbacks.forEach(c => c());
     });
 
-    _socket.on('disconnect', () => {
+    socket.on('disconnect', () => {
         console.log('Socket is disconnected');
     });
 
-    _socket.on('error', (err) => {
+    socket.on('error', (err) => {
         console.log('Connect socket fail', err);
     });
+
+    cb(params);
 };
 
 export const disconnect = () => {
     if (socket) {
         socket.disconnect();
-        isLoading = false;
-        socket = null;
     }
-};
-
-const retry = (func, params, room_id) => {
-    console.log('retry');
-
-    const onConnected = () => {
-        func(params);
-    };
-
-    connect(room_id, onConnected);
 };
