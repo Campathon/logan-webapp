@@ -40,6 +40,23 @@ export function removeListenUserChange() {
     }
 }
 
+// close game
+export function listenRoomClose({room_id, cb}) {
+    if (socket) {
+        console.log('listenRoomClose', room_id);
+        socket.on('roomClosed', cb);
+    } else {
+        retry(listenRoomClose, {room_id, cb}, room_id);
+    }
+}
+
+export function removeListenRoomClose() {
+    if (socket) {
+        console.log('removeListenRoomClose');
+        socket.off('roomClosed');
+    }
+}
+
 
 // start game
 export function listenStartGame({room_id, cb}) {
@@ -58,9 +75,15 @@ export function removeListenStartGame() {
     }
 }
 
+let callbacks = [];
+let isLoading = false;
+
 export const connect = (room_id, cb) => {
-    if (socket) {
+    callbacks.push(cb);
+    if (isLoading) {
         return;
+    } else {
+        isLoading = true;
     }
 
     let _socket = io.connect(BASE_URL, {query: {room: room_id}});
@@ -68,7 +91,8 @@ export const connect = (room_id, cb) => {
     _socket.on('connect', () => {
         socket = _socket;
         console.log('Connect socket successfully!');
-        cb();
+
+        callbacks.forEach(c => c());
     });
 
     _socket.on('disconnect', () => {
@@ -83,6 +107,7 @@ export const connect = (room_id, cb) => {
 export const disconnect = () => {
     if (socket) {
         socket.disconnect();
+        isLoading = false;
         socket = null;
     }
 };

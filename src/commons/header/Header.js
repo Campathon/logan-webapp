@@ -12,6 +12,7 @@ import {
 } from "reactstrap";
 import AuthenService from "../../services/AuthenService";
 import * as SocketService from "../../services/SocketService";
+import * as roomApi from "../../api/room-api";
 
 class Header extends Component {
 
@@ -31,6 +32,9 @@ class Header extends Component {
     }
 
     _handleLogout() {
+        const userInfo = AuthenService.get();
+        roomApi.closeRoom({room: userInfo.room_id});
+
         SocketService.disconnect();
         AuthenService.set(null);
     }

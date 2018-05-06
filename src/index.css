@@ -24,6 +24,10 @@ body {
   width: 15px;
 }
 
+.mgb-sm {
+  margin-bottom: 20px;
+}
+
 .mgb {
   margin-bottom: 40px;
 }

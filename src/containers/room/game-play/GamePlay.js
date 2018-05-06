@@ -36,7 +36,7 @@ class GamePlay extends Component {
             <div className=''>
                 {
                     userCard ? (
-                        <div>
+                        <div className='mgb-sm'>
                             <h4>Thẻ của bạn</h4>
                             <Row>
                                 <Col xs={12} sm={6}>

@@ -4,6 +4,7 @@ import GamePlay from "./game-play/GamePlay";
 import Waiting from "./waiting/Waiting";
 import * as roomApi from "../../api/room-api";
 import * as SocketService from "../../services/SocketService";
+import AuthenService from "../../services/AuthenService";
 
 class RoomRoute extends Component {
 
@@ -44,11 +45,23 @@ class RoomRoute extends Component {
                     isPlaying: true
                 });
             }
-        })
+        });
+
+        SocketService.listenRoomClose({
+            room_id,
+            cb: () => {
+                console.log('close room', room_id);
+                SocketService.disconnect();
+                AuthenService.set(null);
+            }
+        });
+
+        console.log('ok ok o k')
     }
 
     componentWillUnmount() {
         SocketService.removeListenStartGame();
+        SocketService.removeListenRoomClose();
     }
 
     render() {
