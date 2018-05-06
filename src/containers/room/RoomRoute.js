@@ -28,6 +28,10 @@ class RoomRoute extends Component {
         }
     }
 
+    _handlePlaying(users) {
+        this.setState({isPlaying: true, userWithCards: users});
+    }
+
     componentDidMount() {
         const {room_id} = this.props.match.params;
 
@@ -36,7 +40,7 @@ class RoomRoute extends Component {
             cb: (listUsers) => {
                 console.log('listUsers', listUsers);
                 this.setState({
-                    // userWithCards: listUsers,
+                    userWithCards: listUsers,
                     isPlaying: true
                 });
             }
@@ -68,6 +72,7 @@ class RoomRoute extends Component {
                                 ) : (
                                     <Waiting
                                         onStart={this._handleStart.bind(this)}
+                                        onPlaying={this._handlePlaying.bind(this)}
                                         room_id={room_id}
                                     />
                                 )

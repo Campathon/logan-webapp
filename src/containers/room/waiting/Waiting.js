@@ -58,7 +58,11 @@ class Waiting extends Component {
                         this.setState({users});
                     }
                 }
-            )
+            );
+
+            if (users.length > 0 && users[0].card) {
+                this.props.onPlaying(users);
+            }
         } catch (err) {
             alert(err.message);
         }
@@ -94,7 +98,7 @@ class Waiting extends Component {
         return users.map(
             (u, i) => (
                 <tr key={u.name}>
-                    <th>{i + 1}</th>
+                    <td>{i + 1}</td>
                     <td>{u.name}</td>
                     <td><Badge color="success">Sẵn sàng</Badge></td>
                 </tr>
