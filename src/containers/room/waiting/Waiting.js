@@ -12,7 +12,7 @@ import {
     CardImg,
     CardBody,
     CardTitle,
-    CardSubtitle, CardText, Row
+    CardSubtitle, CardText, Row, Popover, PopoverHeader, PopoverBody
 } from "reactstrap";
 import * as roomApi from "../../../api/room-api";
 import * as cardApi from "../../../api/card-api";
@@ -24,6 +24,7 @@ class Waiting extends Component {
     state = {
         users: [],
         cards: [],
+        selectedCards: [],
         canSelectCard: false
     };
 
@@ -33,7 +34,11 @@ class Waiting extends Component {
         try {
             const users = await roomApi.getUsers({room: room_id});
             const cards = await cardApi.getCards();
-            this.setState({users, cards});
+            const selectedCards = cards.map(
+                c => ({id: c._id, total: 0})
+            );
+
+            this.setState({users, cards, selectedCards});
 
             SocketService.listenNewUserJoin(
                 {
@@ -62,10 +67,22 @@ class Waiting extends Component {
         this.setState({canSelectCard: true});
     }
 
+    _handleCardTotalChange(card_id, event) {
+        const value = event.target.value;
+        const {selectedCards} = this.state;
+
+        this.setState({
+            selectedCards: selectedCards.map(
+                (c, i) => ((c.id === card_id) ? {...c, total: parseInt(value || 0)} : c)
+            )
+        });
+
+    }
+
     _renderUserRow(users) {
         return users.map(
             (u, i) => (
-                <tr>
+                <tr key={u.name}>
                     <th>{i + 1}</th>
                     <td>{u.name}</td>
                     <td><Badge color="success">Sẵn sàng</Badge></td>
@@ -77,16 +94,23 @@ class Waiting extends Component {
     _renderCards(cards) {
         return cards.map(
             (c, i) => (
-                <Col sm={6}>
+                <Col sm={6} key={c.name}>
                     <Card className='logan-card'>
                         <CardImg top width="100%" src={c.image} alt="card"/>
                         <CardBody>
-                            <CardTitle>{c.name}</CardTitle>
+                            <CardTitle>
+                                {c.name}
+                                {/*<Popover placement="bottom" isOpen={this.state} target="Popover1" toggle={this.toggle}>*/}
+                                    {/*<PopoverHeader>Popover Title</PopoverHeader>*/}
+                                    {/*<PopoverBody>Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</PopoverBody>*/}
+                                {/*</Popover>*/}
+                            </CardTitle>
                             <Form inline>
                                 <FormGroup>
                                     <Input
                                         type='number'
                                         placeholder='Số lượng'
+                                        onChange={(event) => this._handleCardTotalChange(c._id, event)}
                                     />
                                 </FormGroup>
                             </Form>
@@ -98,7 +122,7 @@ class Waiting extends Component {
     }
 
     render() {
-        const {users, cards, canSelectCard} = this.state;
+        const {users, cards, canSelectCard, selectedCards} = this.state;
 
         const userInfo = AuthenService.get();
 
@@ -125,7 +149,7 @@ class Waiting extends Component {
                                     <Row>{this._renderCards(cards)}</Row>
                                     <Button
                                         color='primary'
-                                        onClick={() => this.props.onStart()}
+                                        onClick={() => this.props.onStart(selectedCards)}
                                     >Bắt đầu trò chơi</Button>
                                 </Fragment>
                             ) : <Button

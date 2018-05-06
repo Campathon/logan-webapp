@@ -12,12 +12,12 @@ class RoomRoute extends Component {
         userWithCards: []
     };
 
-    async _handleStart() {
+    async _handleStart(selectedCards) {
         const {room_id} = this.props.match.params;
 
         try {
             await roomApi.readyRoom({room: room_id});
-            const playRoom = await roomApi.playRoom({room: room_id});
+            const playRoom = await roomApi.playRoom({room: room_id, cards: selectedCards});
             const userWithCards = playRoom.users;
 
             console.log('userWithCards', userWithCards);
