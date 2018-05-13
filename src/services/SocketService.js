@@ -96,5 +96,6 @@ export const connect = (room_id, cb, params) => {
 export const disconnect = () => {
     if (socket) {
         socket.disconnect();
+        socket = null;
     }
 };

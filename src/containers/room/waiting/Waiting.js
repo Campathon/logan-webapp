@@ -54,7 +54,6 @@ class Waiting extends Component {
                 {
                     room_id,
                     cb: (users) => {
-                        console.log('users', users);
                         this.setState({users});
                     }
                 }

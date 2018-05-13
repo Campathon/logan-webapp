@@ -21,8 +21,6 @@ class RoomRoute extends Component {
             const playRoom = await roomApi.playRoom({room: room_id, cards: selectedCards});
             const userWithCards = playRoom.users;
 
-            console.log('userWithCards', userWithCards);
-
             this.setState({isPlaying: true, userWithCards});
         } catch (err) {
             alert(err.message);
@@ -39,7 +37,6 @@ class RoomRoute extends Component {
         SocketService.listenStartGame({
             room_id,
             cb: (listUsers) => {
-                console.log('listUsers', listUsers);
                 this.setState({
                     userWithCards: listUsers,
                     isPlaying: true
@@ -55,8 +52,6 @@ class RoomRoute extends Component {
                 AuthenService.set(null);
             }
         });
-
-        console.log('ok ok o k')
     }
 
     componentWillUnmount() {
